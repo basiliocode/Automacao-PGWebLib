@@ -1,0 +1,170 @@
+===============================================================================
+
+                     <<< Biblioteca PGWebLib.so >>>
+
+===============================================================================
+
+Esta é a biblioteca PGWebLib.so para integração com a solução Pay&Go Web.
+
+========================================
+== Conteúdo do pacote de distribuição ==
+========================================
+
+- PGWebLib.txt: Este arquivo.
+
+- PGWebLib.so: SO utilizada pelo cliente para efetuar transações através do sistema Pay&Go Web.
+
+- PGWebLib.h: Header (linguagem C) declarando as funções e constantes exportadas por PGWebLib.so.
+
+- PWL_Type.h: Header (linguagem C) declarando os tipos utilizados por PGWebLib.h.
+
+- PGWebLibTest.exe: Programa de teste da biblioteca.
+
+- PGWebLibTest.c: Arquivo-fonte (linguagem C) do executável PGWebLibTest.
+
+- "PGWeb LibC - Especificação de integração - vx.xx.pdf": Especificação de uso de PGWebLib.so.
+
+- certificado.crt - Certificado para autenticação junto ao Pay&Go WEB, deve estar na mesma pasta de PGWebLib.so.
+
+=====================================
+== Instruções de uso do Pay&Go Web ==
+=====================================
+
+- A primeira transação a ser efetuada é a de INSTALAÇÃO. Esta pode ser acionada diretamente
+  (PWOPER_INSTALL), ou através de uma transação ADMINISTRATIVA (PWOPER_ADMIN).
+  
+- No decorrer da transação de instalação são solicitadas as configurações necessárias para operação
+  do Ponto de Captura. Para alterar estas configurações após isso, acionar a transação de CONFIGURAÇÃO,
+  diretamente (PWOPER_CONFIG), ou através de uma transação ADMINISTRATIVA (PWOPER_ADMIN).
+
+- Quando solicitada a senha técnica, informar "314159".
+
+- A primeira comunicação com o PIN-pad pode demorar até 1 minuto, devido à coleta de todas as suas
+  informações.
+
+- Após realizar a transação de instalação com sucesso, um comprovante será gerado, listando os
+  sistemas de autorização configurados para o Ponto de Captura. A partir deste momento, outras transações
+  poderão ser realizadas (venda, recarga, etc.).
+
+- Lembrar de sempre confirmar (ou desfazer) cada transação efetuada antes de realizar a próxima. 
+
+===============================================
+== Instruções de uso do aplicativo de testes ==
+===============================================
+
+- Copiar os arquivos PGWebLib.so e PGWebLibTest para um diretório vazio com direito de gravação,
+  e executar PGWebLibTest.
+
+- O aplicativo de testes abre uma janela Console (modo texto) permitindo:
+  - O acionamento individual de funções específicas da SO (itens "PW_i...");
+  - A realização de testes completos de determinadas transações (itens "Teste ...").
+
+- Antes de qualquer coisa, acionar a função "PW_iInit" e informar o diretório de trabalho (por
+  exemplo, "." (ponto, sem as aspas) para trabalhar no diretório corrente). Neste diretório serão
+  automaticamente criados novos diretórios de trabalho para armazenamento de dados e logs.
+
+- Para as opções de testes completos de transações, a captura de dados adicionais é realizada
+  automaticamente e, no final da transação são apresentados todos os valores PWINFO_xxx
+  disponibilizados através de PW_iGetResult.
+
+- A opção PW_iConfirmation deve ser utilizada para confirmar as transações bem sucedidas:
+  - Digitando as informações da transação original (obtidas através de PW_iGetResult); ou
+  - Sem digitação das informações, se acionado imediatamente após um "teste completo".
+
+==========================
+== Histórico de versões ==
+==========================
+
+v0003.0018.0000.0000 (09/Set/2016)
+----------------------------------
+- Primeira versão Ubuntu Desktop 16.04.1.
+
+
+0004.0000.0050.0000 (13/Jun/2018)
+----------------------------------
+- CA18-0049: Alterações necessárias para funcionamento da criptografia RSA na plataforma de 64 bits.
+
+ ********** PGWebLibC **********
+- Criação de novo tipo de transação para cancelamento de pagamento de conta.
+- CA18-0043: Correção na mensagem de confirmação de dados no PIN-Pad.
+- CA18-0046: Correção na busca do AID utilizado nas tabelas de instalação do PGWeb para PP Ingênico.
+             Tratamento de nova carga de tabelas caso o usuário cancele (Roteamento).
+- CA18-0048: Tratamento para retornar o nomo campo (Nome do cartão padronizado) para a automação.
+- CA18-0049: Atualização da PGWebLib Ubuntu 32 bits para a última versão da biblioteca e criação da primeira versão Ubuntu 64 bits.
+
+
+0004.0000.0051.0000 (25/Jun/2018)
+----------------------------------
+- CA18-0049: Passa a ser possível utilizar o roteamento de bandeiras.
+- CA18-0049: Correção no erro na compressão/descompressão de dados.
+
+ ********** PGWebLibC **********
+- CA18-0050: Busca do AID será realizado somente no roteamento.
+- CA18-0051: Remoção da acentuação e conversão para maiúscula quando consultado o nome do EC
+             no XML de instalação.
+- CA18-0052: Ajustes nas tags de comunicação entre Muxx e ponta.
+
+0004.0000.0059.0000 (24/Ago/2018)
+----------------------------------
+- CA18-0075: Correção do problema de invasão de memória, ao registrar nos logs mensagens com mais de 
+             1024 caracteres.
+
+********** PGWebLibC **********
+- CA18-0057: Tratamento para PIN-pad PPC920 com versão antiga referente aos AIDs CTLS.
+- CA18-0061: Correção no processamento local do tipo de cartão e tipo de financiamento, onde 
+             era possível que a biblioteca enviasse a solicitação de captura seguinte sem 
+             apagar os dados da antiga.
+- CA18-0068: Implementado camada de tratamento comum de PIN-pad.
+             Adicionado tratamento de "merge de AID" para PIN-Pad iPP320 não ABECS.
+             Ajustado a seleção do AID do cartão em caso de transação negada.
+             Alterado a substituição de índice de PIN-Pad iPP320 para posição 04 quando
+             a adquirente utiliza aplicações acima de 3.
+             Correção do comando ChangeParam para PP não ABECS.
+- CA18-0063: Correção na carga de tabelas do roteamento, onde caso o perfil possuisse alguma rede
+             sem CHIP, por exemplo Conductor, a ponta realizava a carga de tabela na posição 00
+             já que o índice era recebido zerado.
+             Correção no tratamento específicos de PIN-pad, onde a seleção de tratamento não era
+             limpa após a troca de PIN-Pad e em algumas situações o tratamento era anulado.
+- CA18-0063: Caso exista somente uma opção para operação de venda, volta a selecionar essa operação 
+             única automaticamente.
+- CA18-0069: Caso seja utilizado o PIN-pad iPP320 com roteamento, haverá o merge de AID devido a
+             limitações do equipamento.
+             Correção na seleção da aplicação quando utilizado iPP320.
+- CA18-0070: Ajustes para a seleção correta da aplicação utilizada quando utilizado o tratamento
+             de determinados PP.
+             Quando utilizado a PGWEBLIB e a porta do COM do PP foi alterado, a LIB tenta realizar
+             a varredura do índice 1 ao 50.
+             Correção no envio dos dados ao PGWEB quando utilizado a PGWEB, problema ocorria somente
+             quando utilizado um PP ABECS pela primeira vez na PGWEBLIB.
+- CA18-0070: Quando utilizado qualquer PIN-pad que não esteja na lista de tratamento, a biblioteca
+             não seguia o fluxo corretamente.
+- CA18-0067: Adicionado tratamentos para o retorno da Tag MUXTAG_AUTHSYSTEXTENDED com as informações
+			    do atributo SistemaAutorizador nas transações.
+- CA18-0074: Correção no tratamento da função inicia por tipo cartão, onde era verificado de forma errada
+             o nome do tipo de cartão que deveria ser exibido caso o Muxx enviasse para ponta.
+             Correção do campo nome do produto que estava sendo enviada de forma errada para o Muxx,
+             fazendo com que algumas transações ocorresse alguns problemas.
+
+
+0004.0000.0062.0000 (11/Set/2018)
+----------------------------------
+********** PGWebLibC **********
+- CA18-0077: Passa a descartar as advices que foram negadas pelo PGWEB. As mesmas serão 
+             evidenciadas nos logs.
+- CA18-0078: Tratamento para PIN-pad iPP320 com base nas inicializações CTLS.
+- CA18-0078: Correção na seleção de AID para determinar qual rede será utilizada no roteamento.
+
+
+0004.0000.0064.0000 (25/Set/2018)
+----------------------------------
+********** PGWebLibC **********
+- CA18-0083: No comando PP_iRemoveCard, caso o PIN-pad não envie a mensagem de remoção do cartão
+             para exibição no checkout via PP_NOTIFY, passa a forçar a exibição da mensagem.
+- CA18-0083: Caso uma transação seja feita utilizando roteamento de bandeiras, envia uma flag 
+             para o Muxx notificando.
+- CA18-0085: Caso exista uma atualização de parâmetros pós troca de versão pendente, a chamada
+             de PW_iGetResult com PWINFO_IDLEPROCTIME passa a retorna o horário atual.
+- CA18-0085: Caso seja chamado PW_iIdleProc e exista uma atualização de parâmetros pós troca de 
+             versão pendente, passa a executá-la imediatamente
+- CA18-0086: Correções nos tratamentos específicos de PIN-pad, que fazia com que alguns pontos de 
+             captura não pudessem utilizar o roteamento de bandeiras.

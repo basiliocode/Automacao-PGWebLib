@@ -1,0 +1,881 @@
+===============================================================================
+
+                     <<< Biblioteca PGWebLib.dll >>>
+
+===============================================================================
+
+Esta é a biblioteca PGWebLib.dll para integração com a solução Pay&Go Web.
+
+========================================
+== Conteúdo do pacote de distribuição ==
+========================================
+
+- PGWebLib.txt: Este arquivo.
+
+- PGWebLib.dll: DLL utilizada pelo cliente para efetuar transações através do sistema Pay&Go Web.
+
+- PGWebLib.lib: Biblioteca para link estático com PGWebLib.dll (Visual Studio 2010).
+
+- PGWebLib.h: Header (linguagem C) declarando as funções e constantes exportadas por PGWebLib.dll.
+
+- PWL_Type.h: Header (linguagem C) declarando os tipos utilizados por PGWebLib.h.
+
+- PGWebLibTest.exe: Programa de teste da biblioteca.
+
+- PGWebLibTest.c: Arquivo-fonte de referência (linguagem C, Visual Studio 2010) utilizado no executável PGWebLibTest.exe para integração com a biblioteca PGWebLib.
+
+- "PGWeb LibC - Especificação de integração - vx.xx.pdf": Especificação de uso de PGWebLib.dll.
+
+=====================================
+== Instruções de uso do Pay&Go Web ==
+=====================================
+
+- A primeira transação a ser efetuada é a de INSTALAÇÃO. Esta pode ser acionada diretamente
+  (PWOPER_INSTALL), ou através de uma transação ADMINISTRATIVA (PWOPER_ADMIN).
+  
+- No decorrer da transação de instalação são solicitadas as configurações necessárias para operação
+  do Ponto de Captura. Para alterar estas configurações após isso, acionar a transação de CONFIGURAÇÃO,
+  diretamente (PWOPER_CONFIG), ou através de uma transação ADMINISTRATIVA (PWOPER_ADMIN).
+
+- Quando solicitada a senha técnica, informar "314159".
+
+- A primeira comunicação com o PIN-pad pode demorar até 1 minuto, devido à coleta de todas as suas
+  informações.
+
+- Após realizar a transação de instalação com sucesso, um comprovante será gerado, listando os
+  sistemas de autorização configurados para o Ponto de Captura. A partir deste momento, outras transações
+  poderão ser realizadas (venda, recarga, etc.).
+
+- Lembrar de sempre confirmar (ou desfazer) cada transação efetuada antes de realizar a próxima. 
+
+===============================================
+== Instruções de uso do aplicativo de testes ==
+===============================================
+
+- Copiar os arquivos PGWebLib.dll e PGWebLibTest.exe para um diretório vazio com direito de gravação,
+  e executar PGWebLibTest.exe.
+
+- O aplicativo de testes abre uma janela Console (modo texto) permitindo:
+  - O acionamento individual de funções específicas da DLL (itens "PW_i...");
+  - A realização de testes completos de determinadas transações (itens "Teste ...").
+
+- Antes de qualquer coisa, acionar a função "PW_iInit" e informar o diretório de trabalho (por
+  exemplo, "." (ponto, sem as aspas) para trabalhar no diretório corrente). Neste diretório serão
+  automaticamente criados novos diretórios de trabalho para armazenamento de dados e logs.
+
+- Para as opções de testes completos de transações, a captura de dados adicionais é realizada
+  automaticamente e, no final da transação são apresentados todos os valores PWINFO_xxx
+  disponibilizados através de PW_iGetResult.
+
+- A opção PW_iConfirmation deve ser utilizada para confirmar as transações bem sucedidas:
+  - Digitando as informações da transação original (obtidas através de PW_iGetResult); ou
+  - Sem digitação das informações, se acionado imediatamente após um "teste completo".
+
+==========================
+== Histórico de versões ==
+==========================
+
+v0000.0090.0000.0000 (09/set/2013)
+----------------------------------
+- Primeira versão.
+
+v0000.0091.0000.0000 (28/out/2013)
+----------------------------------
+- Correção da falha onde, ao ocorrer um erro de PIN-pad, o retorno para a automação poderia ser
+  erroneamente o valor "2".
+- Correção da falha onde, ao efetuar uma transação com fallback de chip para tarja, a biblioteca
+  informava o Pay&Go Web que a transação foi feita diretamente utilizando a tarja.
+- Passa a exibir a mensagem de ociosidade no PIN-pad que em algumas situações não estava sendo exibida.
+- Passa a retornar para a automação as informações da transação pendente, caso exista uma impedindo
+  a realização de novas transações.
+- Passa a fazer as seleções possíveis "offline" utilizando o arquivo de parâmetros recebido do Pay&Go Web,
+  otimizando o tempo de transação.
+- Deixa de pedir a senha tecnica para visualizar a versão do aplicativo.
+- Correção da falha no envio da quantidade de parcelas de uma venda parcelada ao Pay&Go Web.
+- Correção da falha onde um erro de autenticação do ponto de captura não exibia a mensagem correta.
+- Correção na confirmação imediata após a transação, os dados obtidos na transação eram repetidos na 
+  obtenção de dados da confirmação.
+- Correção do problema onde, ocasionalmente, o log de comunicação poderia não ser criado.
+- Passa a enviar os dados detalhados do PIN-pad para o Pay&Go Web em toda instalação.
+- Logs de comunicação passam a logar o tamanho das mensagens.
+- Aplicativo de testes passa a exibir a mensagem "PROCESSANDO..." enquanto aguarda resposta do Pay&Go Web.
+- Passa a efetuar a limpeza de logs anteriores a 90 dias.
+- Passa a validar nas funções de PIN-pad, se a função chamada corresponde a captura que deveria ser feita.
+- Deixa de validar o recebimento do número de controle em TODAS as transações de instalação COM ERRO.
+- Implementação do tratamento das mensagens para auto-atendimento.
+- Passa a ser possível customizar a mensagem exibida no PIN-pad ocioso através do Pay&Go Web.
+- Correção na função PP_iAbort().
+- Quando cartão magnético não é permitido, passa a exibir a mensagem "CARTAO MAGNETICO NAO PERMITIDO"
+  por mais tempo no PIN-pad.
+- Correção no tratamento do número de referência local recebido do Pay&Go WEB.
+- Implementação da comunicação criptografada, utilizando TLS 1.0.
+
+v0000.0092.0000.0000 (12/nov/2013)
+----------------------------------
+- Correção de erro detectado na REDECARD com cartão Diners, onde o PIN-pad retornava uma mensagem maior que a esperada
+  causando invasão de memória e travamento do módulo.
+- Correção de erro detectado pela Verti ao fazer a integração, relacionado ao tratamento do tamanho da estrutura PW_GetData
+  na chamada da função PW_iExecTransac.
+- Correção de erro ao fazer um fallback de chip para tarja sem o modo de entrada via tarja magnética habilitado.
+- Correção de erro detectado pelo CQ, ao acionar uma rede que não possui transações com cartão com chip e inserir um cartão
+  com chip a mensagem apresentada era "PROBLEMA ARQUIVO PARAMETROS" e passará a ser "CARTAO COM CHIP NAO PERMITIDO", retornando
+  a aguardar o cartão.
+
+  
+v0000.0093.0000.0000 (13/nov/2013)
+----------------------------------
+- Correção de bug na leitura de arquivos XML inserido na versão 0.92.0.0 que nem chegou a ser testada pelo C.Q.
+
+
+v0000.0094.0000.0000 (03/fev/2014)
+----------------------------------
+- Passa a exibir a mensagem de ociosidade no PIN-pad caso ocorra um fallback para captura do dado digitado.
+- Correções para tratamento correto de timeout de conexão e recebimento na camada SSL.
+- Criação das novas funções PW_iPPRemoveCard, PW_iPPDisplay e PW_iPPWaitEvent.
+- Passa a abrir e fechar o PIN-pad a cada transação.
+- Passa a exibir a mensagem de resultado da transação no PIN-pad, para o caso de autoatendimento.
+- Passa a oferecer a opção de autoatendimento na console de testes.
+- Melhorias internas no tratamento de confirmação/desfazimento.
+- Passa a pedir a senah técnica mascarada.
+
+
+v0000.0095.0000.0000 (05/fev/2014)
+----------------------------------
+- Alterações para aceitar wildcard nos certificados SSL.
+
+v0000.0096.0000.0000 (08/mai/2014)
+----------------------------------
+- Correção do Erro de autenticação do ponto de captura (SAC 760898), não armazenava o número de controle em memória
+  estática após a recepção do mesmo.
+- Correção do erro no relatório (SAC 761619), não armazenava o número de solicitação em memória estática após a
+  sua atualização.
+- Passa a não permitir que uma nova mensagem seja enviada ao servidor, caso o último dado solicitado pelo mesmo não
+  tenha sido adicionado, neste caso a biblioteca faz o tratamento localmente e solicita o dado novamente.
+- Em transações com CHIP, passa a exibir a mensagem "NAO RETIRE O CARTAO" após a digitação da senha e até a finalização 
+  da transação.
+- Passa a desmarcar os envios de desfazimento por segurança somente após checar se a resposta do servidor foi consistente.
+- Passa a fazer o tratamento para quais vias de comprovante devem sem impressas (MUXTAG_RCPTPRN).
+- Passa a iniciar o processo de conexão ao servidor na chamada da função PW_iNewTransac, anteriormente ele era iniciado em
+  PW_iExecTransac.
+- Passa a exigir uma confirmação do usuário antes de efetuar uma função de MANUTENÇÃO.
+- Passa a ser possível acessar a função de CONFIGURAÇÃO após o ponto de captura estar instalado.
+- Com exceção dos pontos de captura configurados como autoatendimento, passa a exibir as mensagem "TRANSACAO REALIZADA" ou
+  "TRANSACAO CANCELADA" baseado no resultado da transação, anteriormente a mensagem "TRANSACAO FINALIZADA " sempre era exibida.
+- Correção no problema que deixava o PIN-pad aberto ao sair da função PW_iPPDisplay.
+- Correção para transações com PAN menor do quer 13 caracteres.
+- Deixa de exibir a mensagem "PROCESSANDO..." caso PW_iPPWaitEvent retorne com evento de tecla.
+- Correção na limpeza automática de logs.
+- Ao inicializar a biblioteca, passa a inserir no log a data da ultima limpeza de logs feita.
+- Atualização para versão 1.0.1g do OpenSSL para correção do problema da invasão por Heartbleed.
+- Passa a atualizar a referência local e o nome do sistema autorizador a cada "perna" da transação, para evitar que a transação 
+  fique pendente quando cai no meio de uma execução de ExecTransac() e a automação tem que enviar o desfazimento.
+- Correção do erro onde o ponto de captura, ocasionalmente, retornava erro no arquivo de parâmetros sem exibir o MENU de operações
+  genéricas.
+- Correção do erro relatado pela VERTI, ao reiniciar o sistema como um todo com um cartão presente no PIN-pad, uma possível transação
+  pendente não era desfeita/confirmada.
+- Passa a fazer um tratamento melhor dos erros das Threads dos comandos não-blocantes.
+
+v0001.0000.0000.0000 (05/Nov/2014)
+----------------------------------
+- Correção para no caso de fallback para tarja, não exibir "NAO RETIRE O CARTAO" na sequência do processamento do cartão.
+- Correção no tratamento para quando o servidor emnvia uma lista específica de aplicações para o PIN-pad.
+- Passa a permitir a obtenção de dados da transação através da função PW_iGetResult, independente do estado do ponto da captura
+  (não instalado, transação não inicializada, etc).
+- Ao executar uma operação de MANUTENÇÃO, passa a exibir a pergunta "APAGAR TODOS OS ARQUIVOS?" na primeira linha do display.
+- Passa a retornar mensagem de resultado para cancelamento de MANUTENÇÃO.
+- Implementação da informação PWINFO_CHOLDVERIF para retorno à automação.
+- Tratamento manual de timeout no GoOnChip para correção de BUG em PIN-pads gertec.
+- Tratamento para atribuição de mensagem de resultado para qualquer erro local.
+- Implementação de multi-idiomas.
+- Correção do envio da TAG 0xDA para o formato BCD no caso de uma captura de senha fora do processo EMV (ERRO 6 C.Q CONDUCTOR).
+- Correção do erro ao tentar utilizar tunel SSL (ERRO 1 C.Q CONDUCTOR).
+- Passa a permitir caracteres especiais na digitação do endereço do servidor (POS Muxx).
+- Implementação do socket na camada acima da camada de comunicação (para permitir integração com automação do POS Muxx).
+- Inversão na ordem das funções no MENU.
+- Para o erro PP_CARDINVALIDAT a mensagem foi alterado de "CARTAO BLOQUEADO" para "CARTAO INVALIDADO".
+- Deixa de mandar imprimir, erroneamente, comprovantes no caso de transação falha.
+- Correção na alocação dinâmica de memória.
+- Passa a permitir a obtenção do dado PWINFO_TRNORIGTIME.
+- Passa a retornar mensagem para o caso de erro de autenticação do ponto de captura em um envio de confirmação.
+- Passa a aceitar prompts maiores que 40 caracteres.
+- Passa a tratar o retorno das informações PWINFO_SMSGCHOLDER, PWINFO_SMSGMERCH e PWINFO_SMSGTOUTSEC para a automação.
+- Correção no formato da hora enviada para o servidor.
+- Correção do alinhamento da mensagem "TRANSACTION CANCELED".
+- Implementação da nova flag MUXTAG_DATANULL, para enviar um dado nulo para o servidor (certificação CIELO)
+- Correção no tratamento de erro na captura de dados no PIN-pad (PP sem chave SETIS, por exemplo).
+- Passa a abrir o PIN-pad na primeira vez que ele for acionado na transação e fechá-lo ao final da transação.
+- Mudança no tratamento de timeouts para ação do usuário e espera pelo cartão.
+- Deixa de enviar MUXTAG_PPAPPTYPE e MUXTAG_PPAPPIDX ao servidor para o caso de cartão magnético.
+- Alteração para que a mudança de versão seja feita sem perder as configurações.
+- Alteração para pedir a remoção do cartão em erros onde não era pedido (afeta quem utiliza a captura do cartão em PW_iPPWaitEvent).
+- Deixa de exibir a opção TESTE DE COMUNICAÇÃO para pontos não instalados.
+- Acrescentado tratamento do "comando genérico" de PIN-pad (PP_StartGenericCmd/PP_GenericCmd).
+- Corrigido: Em caso de timeout do Muxx, após uma transação bem sucedida, exibia mensagem de aprovação 
+  da transação anterior.
+
+v0001.0001.0000.0000 (04/Dez/2014)
+----------------------------------
+- Caso uma transação tenha ficado pendente de desfazimento e tenha sido finalizada, é feita uma tentativa 
+  imediata de envio de desfazimento para o servidor.
+- Passa a pedir a remoção do cartão, caso uma transação seja abortada pela automação.
+- Passa a tratar as mensagens adicionais a serem exibidas ao usuário para transações negadas.
+- Correção do problema de confirmação para cliente PGWebLibC (PDVS_MUXX).
+- Implementação da criptografia de um dado no PIN-pad quando solicitado pelo Muxx.
+- Correção do problema onde, em certas ocasiões, ao solicitar o comando PW_iPPAbort, a remoção do cartão não era solicitada.
+
+v0001.0002.0000.0000 (10/Dez/2014)
+----------------------------------
+- Correção do problema detectado no piloto VERTI, onde algumas transações não eram realizadas com o erro "QUEDA DE CONEXAO" e outras
+  com o erro "NAO FOI POSSIVEL CONECTAR".
+- No caso de ocorrer um erro e o host não responder uma mensagem, passa a exibir a mensagem "SEM RESPOSTA DO SERVIDOR".
+- Deixa de exibir a mensagem "PROCESSANDO..." no PIN-pad após a execução de um comando PW_iPPWaitEvent.
+- Melhorias nos logs.
+- Passa a tratar mensagens para exibição ao usuário antes da próxima captura também no PIN-pad.
+- Corrige o erro de tradução de alguns erros de PIN-pad para o padrão do PGWebLib.
+- Passa a checar a integridade dos arquivos no momento da inicialização da biblioteca.
+
+v0001.0003.0000.0000 (12/Jan/2015)
+----------------------------------
+- Correção no formato da mensagem de PIN-pad "CARTAO INVALIADO".
+- Melhoria nos logs de PIN-pad.
+- Correção nos timeouts de usuário.
+- Passa a tratar os parâmetros de comunicação recebidos do servidor.
+
+v0001.0004.0000.0000 (18/Mar/2015)
+----------------------------------
+- Correção do erro onde, ao utilizar uma afiliação RV com pagamento com cartão, a rede do pagamento com cartão era mostrada no menu administrativo.
+  (erro detectado nos testes REDE com PDVS_MUXX, erro não ocorre em outros tipos de ponto de captura).
+- Passa a ser possível escolher os eventos a serem monitorados (teclas, passagem e/ou inserção de cartão) em PW_iPPWaitEvent
+
+v0001.0005.0000.0000 (25/Mar/2015)
+----------------------------------
+- Correção do erro detectado em produção para as VMPay VERTI, onde os PdC apresentavam "ERRO DE AUTENTICACAO DO PONTO DE CAPTURA". (Inversão de ordem das mensagens).
+- Correção do erro detectado pelo C.Q onde, ao selecionar a opção "CONFIGURACAO", o próximo menu exibido era o mesmo anterior,
+  não entrando na opção de configuração, como deveria.
+
+  v0001.0012.0000.0000 (14/Jul/2015)
+----------------------------------
+- Passa a enviar primeiro a confirmação automatica antes de qualquer confirmação solicitada manualmente pela automação.
+- Correção do problema de eventual travamento do PIN-pad na função PW_iPPConfirmation.
+- Passa a adicionar o número do cartão completo para envio ao servidor quando o cartão é obtido via PW_iPPWaitEvent.
+- Inserido tratamento para as faixas de TAGS definidas de acordo com o tipo do dado na função PW_iAddParam.
+- Caso seja passado um parametro de entrada invalido em PW_iPPWaitEvent, passa a monitorar todos os eventos.
+- Passa a ser possível detectar cartões sem contato através da função PW_iPPWaitEvent.
+- Passa a solicitar para o cliente a validação da senha do lojista, quando necessário.
+- Correção para tratamento para as faixas de TAGS definidas de acordo com o tipo do dado na função PW_iAddParam, passa a tratar uma faixa única para dados binários,
+  independente do tamanho ocupado em bytes.
+- Adequações para PCI-DSS, passa a apagar dados sensíveis da memória volátil logo após utilizá-los.
+- Alteração no tratamento para senhas técnica e do lojista, a automação passa a validar a senha e informar para a biblioteca um identificador do usuário autenticado.
+- Passa a ser possível obter, através da função PW_iGetInfo, se existe ou não alguma pendência a ser resolvida entre o ponto de captura e o Muxx, utilizando o identificador PWINFO_SERVERPND.
+- Adicionado suporte ao TLS v1.1 e ao TLS v1.2.
+- Implementação dos status mais detalhados da transação.
+- Corrigido: caso a senha do portador fosse digitada errada, poderia ocorrer erro de timeout durante a próxima tentativa. 
+- Corrigido erro onde, ocasionalmente, poderia ser enviada uma confirmação em duplicidade.
+- Acrescentado tratamento para não ocasionar um erro, caso a automação chame um NewTransac enquanto a lib estiver
+  executando uma confirmação com o servidor.
+- Acrescentado tratamento para não ocasionar um erro, caso a automação chame um PPDisplay ou PPWaitEvent enquanto a lib estiver
+  executando uma confirmação com o servidor.
+- Implementação da descompactação das TAGS compactadas recebidas do Muxx.
+- Versão de protocolo incrementada para 0x07.
+- Correção na formatação das trilhas quando o PAN é menor que 16 dígitos e a biblioteca está utilizando a comunicação segura.
+- Correção no acionamento de funções administrativas diretamente pelo PW_INewTransac.
+- Correção no envio de desfazimento após uma falha de comunicação.
+- Alteração para funcionamento de diferente tipos de cancelamento.
+- Correção no tratamento da resolução automática de transações, no caso da biblioteca não conseguir se comunicar com o servidor no
+  momento da primeira tentativa de envio das informações.
+- Alteração na mensagem "NAO RETIRE O CARTAO" para "PROCESSANDO".
+- Implementação do novo status de desfazimento automático MUXCNF_REV_MRDATA_POS, para evitar que a transação fique pendente, caso 
+  a automação não envie um status para a transação após algum erro ocorrer durante alguma captura de dado.
+
+v0001.0013.0000.0000 (11/Ago/2015)
+----------------------------------
+- Caso os parâmetros TargetPercent, Threshold, MaxTargetPercent, TagListOff e FlagsIN 
+  estejam ausentes no XML, passa a atribuir valores default a eles ao invés de retornar erro. 
+- Passa a bloquear o fallback para cartão digitado caso a digitação do cartão não esteja habilitada.
+- Somente quando o usuário digita um cartão após um erro de CHIP e um erro de TARJA, passa a enviar o modo de entrada como fallback digitado.
+- Melhorias na função de envio de confirmação.
+- Correção no erro detectado na função PW_iIdleProc quando o envio da confirmação falhava em uma primeira tentativa.
+- Correção no envio da confirmação da transação após a primeira confirmação falhar e a automação confirmar outra transação antes do envio automático do
+  primeiro desfazimento/confirmação que falhou.
+- Correção do erro onde uma transação fallback digitado subia para o servidor como transação digitada.
+- No caso de autoatendimento, seleção automática de produto para o uso de cartão ALELO na rede CIELO.
+- No caso de autoatendimento, seleção automática de rede para cartões com chip e tarja.
+
+v0003.0000.0000.0000 (24/Ago/2015)
+----------------------------------
+- Permite realizar o processamento local da transação, efetuando a troca de 
+  mensagens com o Servidor somente no momento da autorização.
+- Deixa de retornar operações duplicadas na função PW_iGetOperations.
+- Diversificação nos códigos de erro interno.
+
+v0003.0001.0000.0000 (25/Ago/2015)
+----------------------------------
+- Correção na validação da trilha 1 do cartão.
+- Correção nas conexões SSL.
+
+v0003.0002.0000.0000 (30/Set/2015)
+----------------------------------
+- No processamento local, correção para os tipos de cartão PRIVATE LABEL.
+- No processamento local, caso a automação não informe a moeda, passa a assumir a moeda da tabela de configuração do terminal.
+- No processamento local, passa a fazer a diferenciação do produto "VOUCHER FROTA" através do nome do produto, recebido na tabela de transação.
+- Correção da seleçao automática de aplicação, onde o ponto de captura podeeria entrar em um loop infinito de troca de mensagens com o servidor.
+- No processamento local, correção na validação do service code do cartão através da trilha1. Caso fosse utilizado um cartão sem a trilha2, ou com ela
+  fora do padrão ISO, um cartão com CHIP poderia seguir o processamento, caso passado pela TARJA.
+- Correção da checagem da necessidade de Senha Técnica/Lojista para a transação, 
+  pois a mesma estava sendo efetuada após o processamento local, gerando inconsistências de fluxo.
+- Correção para o erro onde ao selecionar um AID de debito, e não existisse tabela de faixa de cartão para o BIN do cartão com transação DEBITO, assumia
+  incorretamente a tabela de transação CREDITO, passará a retornar a mensagem "NAO EXISTEM PRODUTOS COMPATIVEIS".
+- Correção na captura offline de "iDtVencimentoFinanciamento".
+- Correção no parse da tabela de criptografia de dados recebida do servidor para processamento local.
+
+v0003.0003.0000.0000 (18/Nov/2015)
+----------------------------------
+- Correção do problema para transações de VOUCHER.
+- Passa a enviar para o servidor os dados de estatistica.
+- Correção no processamento local com mais de um estabelecimento.
+- Passa a fazer o tratamento dos dados para atualização de versão.
+- Corrigido: durante o processamento dos cartões com CHIP, uma mensagem inválida estava sendo enviada 
+  para o PIN-pad sempre que o índice da chave a ser usada para a captura do PIN era maior que 9.
+- Corrigido: quando for passado um cartão magnético, não mais consiste o conteúdo das trilhas, 
+  devido aos cartões proprietários (não obedecem a norma ISO-7813).
+- Correção na validação de senha no processamento local, como efeito colateral o menu de CANCELAMENTOS não estava funcionando.
+- Correção dos desfazimentos que ocorriam após a aprovação da transação.
+- Adicionado tratamento para contonar a situação onde a mensagem "ERRO PINPAD" era apresentada ao reiniciar a biblioteca após
+  um encerramento de forma abrupta onde o PIN-pad ficava aberto (ocorria somente com os PIN-pads Ingenico).
+- Ajuste no tratamento da criptografia para trilha 1 (criptografia de dados).
+- Correção da exibição das mensagens adicionais para o usuário.
+- Correção para que não seja mais exibida a opção de tipo de cartão "OUTROS" para cartões com CHIP, esta opção deve ser exibida
+  somente para cartões private label.
+
+v0003.0004.0000.0000 (23/Nov/2015)
+----------------------------------
+- Correção no processamento local, referente ao produto "VOUCHER".
+
+v0003.0010.0000.0000 (13/Jan/2016)
+----------------------------------
+- Passa a fechar o PIN-pad após o comando RemoveCard, caso isso não for feito, o PIN-pad pode ficar travado na mensagem de resultado da transação. 
+- Correção na validação se a automação adicionou os dados solicitados, retornando a solicitação sem processamento caso a captura solicitada não tenha sido feita.
+- Adicionados logs do processamento local e de envio de confirmações/desfazimentos.
+- Eliminação do status MUXCNF_PND_MOREDATA do PGWebLib, verificação necessária passa a ser feita com o nibble de transação pendente + resultado da transação = MUXRES_MOREDATA.
+- Ajustes gerais para permitir transação digitada no Android. 
+- Correção nos tratamentos de display do pinpad para o Android. 
+- Correção de erro detectado no processamento de FinishChip em conjunto com a aprovação da transação, caso na captura anterior (solicitada pelo servidor), tivesse sido solicitado
+  mais de um dado, sendo o dado no PIN-pad o segundo dado, poderia ocorrer o travamento da biblioteca.
+- Nova funcionalidade: Na captura de uma confirmação positiva do usuário no PIN-pad, passa a retornar para o servidor os tamanhos mínimo e máximo utilizado para os dados capturados.
+
+v0003.0011.0000.0000 (22/Jan/2016)
+----------------------------------
+- (CA16-0003): Correção do erro que ocorria para cartões multiplos, em que era validado apenas os parâmetros de valor minimo/máximo para o primeiro produto, gerando inconsistências em caso de diferenças na faixa do valor.
+- CA16-0004: Implementação para permitir capturar a versão de Windows 10 e Windows 8.1.
+
+
+v0003.0012.0000.0000 (23/Fev/2016)
+----------------------------------
+- Implementação da possibilidade de reutilização das chaves de sessão no caso de uma conexão SSL, reduzindo o tempo de handshake SSL e consequentemente o tempo de conexão ao servidor PGWeb.
+- Aumento do buffer de recebimento de 105KB para 256KB.
+- Implementação do novo tipo de captura local "DtEmbarque".
+
+
+v0003.0013.0000.0000 (17/Mar/2016)
+----------------------------------
+- Correção no tratamento de atualização de parâmetros junto ao servidor quando o ponto de captura utiliza o processamento local. Sem esta correção, todas atualizações de parâmetros retornariam a mensagem
+  "CONFIGURE O TERMINAL" e perderiam a transação atual, retomando o funcionamento normal somente na transação seguinte.
+- Correção no processamento local da "CriptografiaNroCartao".
+- Correção no processamento local na validação de um dado qualquer, não estava sendo repassada a mensagem a ser exibida caso o dado não fosse válido.
+- No processamento local, inversão da exibição do menu de financiamento, agora a opção "PARCELADO ESTAB." passa a ser exibido acima da opção "PARCELADO EMISSOR".
+- No caso do erro PWRET_HOSTCONNUNK no momento da conexão ao host, passa a inserir no log detalhes a respeito do erro.
+- No processamento local, correção nos logs, no caso de falha na validação de condição de alguma dado a ser solicitado no fluxo de capturas.
+- Correção do erro onde, no processamento local, a senha era solicitadas antes dos dados da transação no caso de uma transação de "FROTA".
+- No processamento local, alteração nas validações de número de parcelas.
+- Passa a ser possível fazer a "Preferência Voucher", solicitando através do Pay&Go WEB.
+- No processamento local, correção de criptografia do número do cartão para o caso de transações digitadas.
+
+v0003.0014.0000.0000 (19/Abr/2016)
+----------------------------------
+- Melhoria no processo de manutenção do terminal, passa a fechar o PIN-pad antes de apagar todos os arquivos.
+- Correção no processamento da "Preferência Voucher".
+- Implementação da "Criptografia Genérica", onde passa ser possível solicitar a criptografia de qualquer dado no PIN-pad para envio ao servidor, através do arquivo
+  de inicialização do terminal.
+- Correção das mensagens de erro para os erros case PWRET_OFFINTERNAL12 e PWRET_OFFINTERNAL13.
+- Correção no "parse" das tabela de inicialização recebidas do servidor, no parâmetro "Solicitar Saque" da tabela de configuração.
+- Correção no "padding" com 0xFF no valor do PAN antes da criptografia no PIN-pad.
+- No processamento local, correção no processamento do comando "GoOnChip", caso fossem utilizados valores de Saque, Taxa de embarque ou taxa de serviço na transação,
+  esses valores não estavam sendo adicionados no valor total passado ao PIN-pad, causando uma inconsistencia de valor total.
+- No processamento local, caso a automação selecione previamente entre as opções de CREDITO/DEBITO e o usuário faça uma transação utilizando cartão com CHIP, passa a filtrar os AIDs do cartão,
+  baseado no que foi passado pela automação.
+- No processamento local, caso o PIN-pad esteja desabilitado na tabela de produtos, ao invés de dar erro passa a aceitar a transação somente como digitada.
+- No processamento local, caso seja solicitada uma criptografia no PIN-pad, e o PIN-pad esteja desabilitado, pula a criptografia e continua o fluxo da transação.
+- No processamento local, alterações na criptografia genérica, para permitir que a delimitação do dado a ser criptografado possa ser feita até o fim do dado ou até determinado
+  caractere ser encontrado.
+
+v0003.0015.0000.0000 (03/Jun/2016)
+----------------------------------
+- Correção de possível invasão de memória na camada de comunicação SSL.
+- No processamento local, correção na formatação de mensagem a ser exibida no PIN-pad, caso a mensagem a ser exibida no display fosse recebida
+  sem nenhum espaço e fosse maior que 16 caracteres.
+- No autoatendimento, correção na validação da Trilha1, para o caso da mesma não seguir o padrão ISO.
+- No processamento local, passa a extrair o PAN das trilhas de cartões que não seguem o padrão ISO.
+- No processamento local, deixa de fazer as validações de trilha 1 e trilha 2, mesmo que solicitado pelo servidor, caso as trilhas não sigam o padrão ISO.
+- No processamento local, passa a fazer a busca de tabelas de produto pela ordem recebida nas tabelas de faixa de cartão (utilizado para selecionar a primeira
+  ocorrência, no caso de BIN em duas faixas diferentes).
+- Implementação da transação de consulta de transações junto ao servidor Muxx.
+
+v0003.0016.0000.0000 (20/Jun/2016)
+----------------------------------
+- Otimização do modo como a versão do módulo é obtida do Windows, visando evitar travamentos do modulo nesta função.
+- Correção no roteamento de BINS, passa a remover o NSU gerado pelo HOST no momento do direcionamento para a segunda rede.
+- Implementação do tipo de financiamento CREDITO EMISSOR, para cartões de débito.
+- Alterações na implementação do produto VOUCHER FROTA.
+- Alterações na implementação do produto PRIVATE LABEL.
+- Implementação da possibilidade de alteração do texto de um item de menu através do arquivo de parâmetros.
+- Implementação do novo tratamento genérico para possibilidade de captura de cartões que não seguem a norma ISO.
+
+v0003.0017.0000.0000 (18/Jul/2016)
+----------------------------------
+- Implementação da possibilidade de detalhamento de datas e valores para as parcelas de uma compra parcelada.
+- Implementação da possibilidade de captura de uma senha diferente da senha do portador, criptografada no PIN-pad.
+- Passa a ser possível solicitar uma validação de senha técnica para uma operação através do arquivo de parametros.
+- No processamento local, correção da validação da data de vencimento de um cartão.
+- No processamento local, correção na validação dos modos de entrada permitidos pelos produtos compatíveis com o BIN do cartão utilizado.
+- Correção no roteamento de BINs, passa a zerar todas as informações antes de encaminhar a transação para a segunda rede.
+- Correção no processamento da confirmação positiva de uma informação no PIN-pad.
+- Correção na integração entre serviços para pagamento com cartão de uma recarga. Caso o pagamento com cartão falhasse, os dados mandatórios
+  adicionados pela automação estavam sendo apagados erroneamente, originando a mensagem "PARAMETROS MANDATORIOS AUSENTES".
+- Correção na integração entre serviços para pagamento com cartão de uma recarga. No menu exibido ao usuário "CARTAO/DINHEIRO", a seleção era
+  assumida sempre como cartão.
+- Correção na validação das senhas, solicitadas pelo servidor.
+- Correção no comportamento quando o servdior solicita uma limpeza no buffer de envio, dados mandatórios estavam sendo apagados.
+- No processamento local, para as validações do formato da data, não estava sendo enviada para a automação a mensagem a ser exibida, caso
+  a data digitada não for uma data válida.
+- Correção do problema com o retorno MOREDATAFNC onde, quando uma transação era negada no FinishChip, a transação poderia ficar pendente caso a primeira tentativa de
+  envio de confirmação falhasse e a automação informasse o status da transação antes do envio da segunda tentativa.
+- Correção na comunicação por ociosidade, em algumas situações poderia ocorrer de enviar um teste de comunicação automático com número de solicitação repetido.
+
+v0003.0018.0000.0000 (05/Set/2016)
+----------------------------------
+- Removida a alteração feita em 18/set/2012 feita para corrigir um bug do PIN-pad I3070, que selecionava uma aplicação diferente da rede enviada ao PIN-pad. A alteração
+  foi removida, pois causava problemas para os novos PIN-pad Ingênico, no tratamento feito no PGTerm para redes com índice acima de 9 (que é alterado para 4).  
+- Correção no sincronimso de Threads no momento do roteamento de BINS para cartão com CHIP. Esse erro poderia gerar envetualmente
+  uma situação onde o cartão poderia ser pedido mais vezes do que o número de redes disponíveis.
+- Correção no roteamento de BINs para o cartão ELO INTERNACIONAL.
+- Na função PW_iTransactionInquiry, passa a verificar se a solução opera ou não com PINPad, pois estava dando "ERRO PINPAD" em soluções 
+  operando sem PINPad no Android.
+- Alterações no processamento local para a captura das parcelas diferenciadas.
+- No processamento local, correção nas transações via fallback. Caso, após uma falha de cartão com chip, a primeira tentativa de tarja falhasse com erro de leitura,
+  a tentativa seguinte via tarja, que deveria seguir com modo de entrada fallback, era interrompida pedindo para que o cartão fosse inserido.
+- No recebimento de mensagens, caso ocorra particionamento de pacotes na camada TCP, passa a permitir que os pacotes sejam dividos em mais de 10 partes. Anteriormente,
+  caso o pacote fosse dividido em mais de 10 partes um erro era retornado.
+
+v0003.0020.0000.0000 (21/Nov/2016)
+----------------------------------
+- Solução de contorno para os PIN-pads ABECS que, no caso de uma falha de leitura da tarja, retornava OK no comando PP_GetCard sem retornar as trilhas.
+- Implementação dos tratamentos necessários para o funcionamento de "valor devido".
+- Na função PW_iAddParam, passa a checar a integridade do identificador do parâmetro adicionado (Passa a retornar PWRET_INVPARAM para identificadores fora da norma TLV).
+- Correção no tratamento das criptografias de dado no PIN-pad solicitadas pelo servidor, caso alguma outra captura fosse solicitada junto com a criptografia, um erro era gerado.
+- Criado novo tipo de financiamento: FINTYPE_PREDATADOPARC (Pré-datado parcelado).
+- Passa a ser possível obter as informações do PIN-pad conectado através da função PW_iGetResult com o parâmetro PWINFO_PPINFO.
+
+v0004.0000.0000.0000 (20/Dez/2016)
+----------------------------------
+- Correção na validação do hostname para conexões via SSL. Passa a fazer a validação também pelo SAN, além de continuar tentando
+  utilizar a validação pelo CN.
+- Passa a solicitar uma atualização de parâmetros, junto ao servidor, após qualquer atualização de versão.
+- Passa a mascarar dados sensíveis para envio ao servidor, caso o mesmo tenha a capacidade de abrir esses dados.
+- Implementação dos tratamentos necessários para o funcionamento do "valor reajustado".
+- Correção no número de solicitação enviado ao Muxx em caso de desfazimentos, quando ocorreu durante a transação uma
+  atualização de parâmetros ou um envio de informações de um novo PIN-pad.
+- Ampliação do tamanho do buffer para captura de NSU da transação.
+- Limpa buffers contendo dados sensíveis para PA-DSS.
+
+v0004.0001.0000.0000 (16/Jan/2017)
+----------------------------------
+- Alteração no esquema de leitura da mensagem vinda do Muxx: passa a efetuar a leitura byte a byte.
+- Passa a ser possível pré-selecionar o estabelecimento a ser utilizado para a transação através da automação, adicionando o CPF/CNPJ
+  do estabelecimento desejado.
+
+v0004.0000.0010.0000 (10/Fev/2017)
+----------------------------------
+- Correção em um erro na mensagem automática pós troca de versão, caso a porta do PIN-pad fosse trocado antes do envio da mensagem para o
+  Pay&Go WEB o terminal poderia ficar travado retornando a mensagem "ERRO PINPAD" sem dar acesso ao menu para reconfiguração da porta de comunicação.
+- Deixa de retornar erro na execução de COMAND_RMVCARD. Mesmo que a remoção do cartão não seja executada corretamente, a transação é aprovada.
+- Caso ocorra algum erro após a aprovação da transação pelo Pay&Go WEB, apaga os comprovantes.
+- Correção do erro onde a mensagem "VALOR NAO ATINGE MINIMO PERMITIDO" era apresentado no ANDROID indevidamente.
+
+v0004.0000.0011.0000 (11/Abr/2017)
+----------------------------------
+- Passa a truncar as mensagens de envio em 18 bytes nos regitros de log.
+- Correção na informação PWINFO_CNFREQ retornada para a automação, no caso de transações negadas pelo Muxx (Status = 0x02), o PGWebLib
+  estava solicitando confirmação por parte da automação erroneamente.
+- Passa a enviar o nome do autorizador para o Muxx em qualquer transação.
+- Mudança no comportamento de replicação da referência local da transação, deixa de replicar o primeiro valor recebido do servidor para replicar sempre o
+  último valor recebido.
+- Deixa de considerar obrigatórios na respostas do Muxx os campos:
+   - MUXTAG_PARAMVER (continua sendo obrigatório para instalações e atualizações de parâmetros), caso esse dado não seja recebido, será considerado 
+     atualizado o arquivo de parâmetros atual.
+   - MUXTAG_SRVAUTH, caso esse dado não seja recebido, será reenviado o último valor armazenado.
+   - MUXTAG_TRNSTATUS, caso esse dado não seja recebido, não serão repassados para a automação os detalhes da transação que está pendente.
+
+v0004.0000.0012.0000 (28/Abr/2017)
+----------------------------------
+- Implementação dos ajustes necessários para que o "roteamento de redes" funcione corretamente com processamento local ativo.
+
+0004.0000.0013.0000-12/Mai/2017
+-------------------------------
+- Ajuste para funcionamento de cartões sem contato no processamento local.
+- Correção na captura do código de segurança, caso fosse digitado os valores "000" ou "0000" era solicitado o motivo da não captura de forma equivocada.
+
+0004.0000.0014.0000-08/Jun/2017
+-------------------------------
+- Correção para o erro do PIN-pad IPP320 que retorna o número de cartão errado para cartões com trilha 2 fora no padrão ISO. 
+
+0004.0000.0015.0000-26/Jun/2017
+-------------------------------
+- Implementação dos tratamentos necessários para o funcionamento do novo retorno do servidor, que mantém a conexão ativa sem nenhuma interação com o usuário.
+- Criação do novo retorno PWRET_NOTHING na função PW_iExecTransac.
+
+0004.0000.0016.0000-07/Jul/2017
+-------------------------------
+- Implementação da possibilidade de conexão em múltiplos endereços através de confgiuração via servidor.
+- Correção na criptografia de dados no PIN-pad, solicitadas pelo servidor.
+- Correção da captura de dados solicitados pelo servidor ("na nuvem"), existia um erro onde, mesmo o servdior solicitando a captura de mais de um dado, só era
+  capturado um dado por vez ("por perna"), agora todos os dados são capturados de uma só vez.
+- Tratamento na função de criptografia de dados (Encrypt Buffer) para suportar novos métodos de criptografias ABECS.
+
+0004.0000.0017.0000-19/Jul/2017
+-------------------------------
+- Correção no processo de criptografia dos dados com chave DUKPT.
+
+0004.0000.0020.0000-09/Ago/2017
+-------------------------------
+- Para pontos de captura do tipo Verti e DLL Win32, correção no tratamento da reutilização das chaves de sessão SSL, caso ocorra algum erro na reutilização, 
+  é feita uma nova tentativa em uma nova sessão. Erro detectado na migração de ambientes Pay&Go WEB com versões diferentes do protocolo TLS.
+- CA17-0049: Implementação do roteamento de bandeiras para os cliente Pay&Go WEB.
+
+0004.0000.0021.0000-28/Ago/2017
+-------------------------------
+- CA17-0050: Tratamentos para capturar todas as informações disponíveis em pinpad ABECS.
+- Correção no processamento offline para cartões CTLS simulando tarja.
+
+0004.0000.0030.0000-29/Ago/2017
+-------------------------------
+- CA17-0049: Implementação do roteamento de bandeiras para os cliente Pay&Go WEB.
+
+0004.0000.0031.0000-06/Set/2017
+-------------------------------
+- CA17-0049: Correção na obtenção do timestamp das tabelas, caso uma rede tenha sido pre-selecionada pela automação.
+
+0004.0000.0032.0000-15/Set/2017
+-------------------------------
+- CA17-0049: Correção no tratamento da venda pre-autorizada.
+- CA17-0049: Melhoria no tratamento da carga de tabelas no PIN-pad em transações sem roteamento de bandeiras.
+- Implementação do tratamento para trilhas do padrão ANSI.
+- CA17-0049: Correção para não capturar tipo de financiamento localmente para transações do autorizador CIELO.
+
+0004.0000.0033.0000-02/Out/2017
+-------------------------------
+- Correção no fallback de cartões sem contato, existia um erro onde a antena nunca era desligada para o uso de outros modos de entrada.
+- Melhoria no processo de escrita e arquivos criptografados.
+- Criação de um mecanismo para tentar a recuperação dos arquivos para o caso de erro no CRC ("ERRO DE ACESSO A ARQUIVO").
+- Correção no tratamento da mensagem de resultado, para o caso de transações em que o PIN-pad foi trocado antes do envio de uma confirmação para o Muxx.
+- No processamento local, deixa de permitir que transações de pre-autorização possam ser aprovadas offline.
+- CA17-0059: Correção na exibição do valor com saque no PIN-Pad para transações via tarja.
+
+0004.0000.0034.0000-09/Out/2017
+-------------------------------
+- CA17-0061: Implementação do envio de advice de transações negadas localmente para o Muxx.
+- Otimização dos logs de comunicação.
+
+0004.0000.0035.0000-24/Out/2017
+-------------------------------
+- CA17-0064: Implementação de uma função para retornar todos os AIDs que estão habilitados para processamento de cartão via chip no Pay&Go WEB e uma função para 
+             retornar se um cartão está habilitado para processamento de cartão via tarja no Pay&Go WEB através de suas trilhas.
+- CA17-0064: Implementação da exibição de uma mensagem específica para o erro ocorrido quando o usuário aproxima dois cartões sem contato do leitor de cartão.
+- CA17-0064: Correção na validação de condições para processamento local com a tag MUXTAG_PAYMENTMODE (pagamento de transações de recarga com processamento local).
+- CA17-0060: Implentação de uma nova função para realizar a criptografia com base nos parâmetros informados no XML de instação do Pay&Go Web.
+
+0004.0000.0036.0000-08/Nov/2017
+-------------------------------
+- Remoção de warnings de compilação.
+- CA17-0067: Correção no fallback para transações com cartão sem contato.
+- CA17-0075: Ajustes para aplicação do padding no final do buffer a ser criptografado.
+
+0004.0000.0037.0000-23/Nov/2017
+-------------------------------
+- CA17-0073: Implementação do funcionamento de PIN-pad ABECS.
+- CA17-0081: Correção no processo de criptografia específica.
+
+0004.0000.0038.0000-07/Dez/2017
+-------------------------------
+- CA17-0079: Roteamento de cartões com mesmo AID para redes diferentes.
+             Criação da possibilidade configurável de solicitação do tipo de cartão (CREDITO/DEBITO) antes da solicitação do cartão
+             Caso a transação automática pós atualização de versão falhe, passa a atualizar a mensagem exibida para o usuário.
+             Passa a capturar o AID de um cartão com chip não aceito no PP_GetCard via seleção direta, somente se configurado via servidor.
+- CA17-0082: Atualização da versão do OpenSSL para 1.0.2m.
+- CA17-0083: Implementação da desconexão do socket sempre antes de uma nova tentativa de conexão com o servidor Pay&Go Web, a ausência
+             desta implementação poderia causa "QUEDA DE CONEXAO".
+             Caso ocorra o erro PP_CTLSSMULTIPLE, deixa de desligar o leitor sem contato, mantendo a possibilidade de uso de cartão sem contato
+             novamente.
+
+0004.0000.0039.0000-14/Dez/2017
+-------------------------------
+- CA17-0087: Passa a permitir transações de débito com o número do cartão digitado, somente quando algum produto disponível para o cartão permitir 
+             esse modo de entrada de cartão.
+- CA17-0087: Correção nas funções de extração de BIN das trilhas do cartão.
+- CA17-0087: Passa a permitir somente uma chamada à função PW_iInit após o carregamento da biblioteca.
+- CA17-0088: Para uma transação negada no FinishChip, passa a subir um advice e um desfazimento para o servidor.
+
+0004.0000.0040.0000-29/Dez/2017
+-------------------------------
+- CA17-0090: Padronização na mensagem de erros em log.
+- CA17-0090: Melhorias e otimizações relacionadas ao processamento em Threads.
+- CA17-0091: Correção no processo de roteamento de cartões com o mesmo AID.
+- Correção da Apresentação da Mensagem do RemoveCard para POS.
+- CA17-0093: Ajuste no padrão da data de vencimento durante o processo de criptografia de dados.
+
+0004.0000.0041.0000-23/Jan/2018
+-------------------------------
+- CA18-0004: Alteração do tamanho máximo do CVC2, de 4 para 5, quando solicitado ao usuário.
+- CA18-0007: Correção no fluxo da solicitação do tipo de cartão quando utilizado o roteamento
+             de bandeira. O mesmo era solicitado de forma errada, mesmo tendo já sido selecionado.
+- CA18-0006: Passa a retornar o CNPJ/CPF para a automação.
+
+0004.0000.0042.0000-05/Fev/2018
+-------------------------------
+- CA17-0010: Correção da exibição do log do finishchip quando executado. Antes não era logado quando o comando era executado com sucesso.
+- CA18-0012: Inclusão do tratamento para captura de taxa de embarque durante o processamento local.
+- CA18-0013: Tratamento para a execução do comando EncryptBuffer (EBX) quando utilizado comandos de PIN-Pad diretamente na PGWebLib.
+- CA18-0013: Passa a subir o tipo de chave do PIN-Pad (ABECS ou não) quando utilizado a PGWebLib diretamente. 
+- Alterado o valor de timeout de comunicação (instalação) de 60 para 300 segundos.
+
+0004.0000.0043.0000-26/Fev/2018
+-------------------------------
+- CA18-0014: Criação de nova função para que a automação possa solicitar a captura de um dado no PIN-pad.
+- CA18-0016: Tratamento para o código resultado do FinishChip quando utilizado PIN-Pad ABECS.
+- CA18-0020: Correção no tratamento para captura de dados do usuário, por exemplo, a captura de CPF.
+- CA18-0018: Correção na exibição do valor total quando solicitado a senha do cartão.
+- CA18-0019: Correção na mensagem exibida ao usuário quando a transação era negada pelo host.
+- CA18-0021: Ampliação nos itens de menu possíveis na interface com a automação, de 20 para 40.
+- CA18-0021: Passa a retorna PWRET_OK para a automação, caso seja chamada a função PW_iPPAbort e não esteja sendo usado PIN-pad.
+- CA18-0021: Correção do problema onde, quando a transação era negada no FNC (cartão ou host), eram enviados dois desfazimentos.
+- CA18-0022: Correção na exibição de mensagens do S920 quando apresentado a mensagem "Cartão com chip".
+
+0004.0000.0044.0000-02/Mar/2018
+-------------------------------
+- CA18-0024: Correção no tratamento para captura de dados do portador do cartão via PIN-Pad.
+
+0004.0000.0045.0000-23/Abr/2018
+-------------------------------
+- CA18-0019: Correção na camada de arquivos para acatar o tamanho máximo de arquivo definido pela PGWebLib.
+- CA18-0033: Tratamento para a execução correta do comando CNG em PIN-Pad ABECS.
+- Correção no indice de verificação de chaves do PP.
+- CA18-0025: Tratamento para extrair a data de validade da trilha 2 ou trilha 1 do cartão
+             e devoler para a automação.
+- CA18-0027: Passa a exibir a confirmação do dado digitado captura pelo PIN-Pad quando
+             solicitado pelo Muxx.
+- CA18-0033: Tratamento para a execução correta do comando CNG em PIN-Pad ABECS.
+-CA18-034: Passa a ser possível exibir mensagens adicionais ao operador/portador a qualquer momento da transação.
+- CA18-0036: Implementação da transação de pagamento utilizando saldo do portador (programa de fidelidade).
+- CA18-0038: Correção na seleção e montagem no menu para cartões private label com aplicação crédito.
+             Correção no comando GOX (SPE_EMVDATA) em PP ABECS.
+- CA18-0036: Passa a armazenar o estado da inserção de cartão EMV através da função PW_iPPWaitEvent para filtrar 
+             transações sem cartão.
+
+0004.0000.0046.0000-21/Mai/2018
+-------------------------------
+- CA18-0036: Passa a efetuar a "preferência voucher" somente se o cartão já tiver sido capturado.
+- CA18-0042: Adaptações para o projeto do MP20.
+- CA18-0041: Passa a exibir o nome fantasia do estabelecimento na tela de captura de valor.
+- CA18-0040: Correção do conflito entre validação de CNPJ e a aceitação de bypass na digitação do valor,
+             caso a situação acima ocorresse era retornado "PARAMETRO INVALIDO".
+- CA18-0040: Correção para as operações de venda com nomes de exibição diferentes, somente a primeira era
+             exibida no menu.
+- CA18-0041: Para o caso de POS sem impressora, deixa de exibir, nos menus, opções recebidas do servidor que 
+             exigem o uso da impressora.
+- CA18-0041: Passa a enviar um advice para o servidor no caso de falhas de comunicação.
+
+0004.0000.0047.0000-25/Mai/2018
+-------------------------------
+- CA18-0042: Tratamentos para acatar parâmetros de comunicação WIFI/GPRS.
+- CA18-0042: Correção de envio de SMS para cartões com tarja.
+- CA18-0042: Ajustes de mensagens e comportamentos para o POS MP20.
+
+0004.0000.0048.0000-30/Mai/2018
+-------------------------------
+- CA18-0042: Tratamento para excluir o ponto de captura quando há uma falha de 
+             comunicação ou instalação no POS.
+- CA18-0042: Ajustes na montagem do Menu de WIFI.
+
+0004.0000.0049.0000-07/Jun/2018
+-------------------------------
+- CA18-0047: Correção para o erro onde a comunicação com o PIN-pad poderia ser feita sem o uso da 
+             criptografia dos dados sensíveis (erro não ocorre para PGNET e POS).
+- CA18-0046: Correção onde o PDC era apagado erroneamente em uma falha de comunicação do com MUXX.
+
+0004.0000.0050.0000 (13/Jun/2018)
+----------------------------------
+- CA18-0049: Alterações necessárias para funcionamento da criptografia RSA na plataforma de 64 bits.
+
+ ********** PGWebLibC **********
+- Criação de novo tipo de transação para cancelamento de pagamento de conta.
+- CA18-0043: Correção na mensagem de confirmação de dados no PIN-Pad.
+- CA18-0046: Correção na busca do AID utilizado nas tabelas de instalação do PGWeb para PP Ingênico.
+             Tratamento de nova carga de tabelas caso o usuário cancele (Roteamento).
+- CA18-0048: Tratamento para retornar o nomo campo (Nome do cartão padronizado) para a automação.
+
+0004.0000.0051.0000 (20/Jun/2018)
+----------------------------------
+- CA18-0050: Busca do AID será realizado somente no roteamento quando a transação for negada.
+- CA18-0051: Remoção da acentuação e conversão para maiúscula quando consultado o nome do EC
+             no XML de instalação.
+- CA18-0052: Ajustes nas tags de comunicação entre Muxx e ponta.
+
+0004.0000.0052.0000 (06/Jul/2018)
+----------------------------------
+- CA18-0055: Correção na busca de AID do cartão caso não tenha o produto para aquele determinado
+             cenário de transação.
+
+0004.0000.0053.0000 (12/Jul/2018)
+----------------------------------
+- CA18-0057: Tratamento para PIN-pad PPC920 com versão antiga referente aos AIDs CTLS.
+
+0004.0000.0054.0000 (20/Jul/2018)
+----------------------------------
+- CA18-0061:  Correção no processamento local do tipo de cartão e tipo de financiamento, onde 
+              era possível que a biblioteca enviasse a solicitação de captura seguinte sem 
+              apagar os dados da antiga.
+
+- CA18-0068:  Implementado camada de tratamento comum de PIN-pad, camada servirá para tratar
+              algumas limitações que determinados PP possuem.
+              Adicionado tratamento de "Merge de AID" para PIN-Pad iPP320 não ABECS.
+              Ajustado a seleção do AID do cartão em caso de transação negada.
+              Alterado a substituição de índice de PIN-Pad iPP320 para posição 04 quando
+              a adquirente utiliza aplicações acima de 3.
+              Correção do comando ChangeParam para PP não ABECS.
+
+0004.0000.0055.0000 (30/Jul/2018)
+----------------------------------
+- CA18-0063: Correção na carga de tabelas do roteamento, onde caso o perfil possuisse alguma rede
+             sem CHIP, por exemplo Conductor, a ponta realizava a carga de tabela na posição 00
+             já que o índice era recebido zerado.
+
+             Correção no tratamento específicos de PIN-pad, onde a seleção de tratamento não era
+             limpa após a troca de PIN-Pad e em algumas situações o tratamento era anulado.
+
+- CA18-0063: Caso exista somente uma opção para operação de venda, volta a selecionar essa operação 
+             única automaticamente.
+
+0004.0000.0056.0000 (06/Ago/2018)
+----------------------------------
+-CA18-0069: Caso seja utilizado o PIN-pad iPP320 com roteamento, haverá o merge de AID devido a
+            limitações do equipamento.
+            Correção na seleção da aplicação quando utilizado iPP320.
+
+0004.0000.0057.0000 (14/Ago/2018)
+----------------------------------
+-CA18-0070: Ajustes para a seleção correta da aplicação utilizada quando utilizado o tratamento
+            de determinados PP.
+            Quando utilizado a PGWEBLIB e a porta do COM do PP foi alterado, a LIB tenta realizar
+            a varredura do índice 1 ao 50
+            Correção no envio dos dados ao PGWEB quando utilizado a PGWEB, problema ocorria somente
+            quando utilizado um PP ABECS pela primeira vez na PGWEBLIB.
+
+0004.0000.0058.0000 (15/Ago/2018)
+----------------------------------
+- CA18-0070: Quando utilizado qualquer PIN-pad que não esteja na lista de tratamento, a biblioteca
+             não seguia o fluxo corretamente.
+
+0004.0000.0059.0000 (23/Ago/2018)
+----------------------------------
+- CA18-0067: Adicionado tratamentos para o retorno da Tag MUXTAG_AUTHSYSTEXTENDED com as informações
+			    do atributo SistemaAutorizador nas transações.
+
+- CA18-0074: Correção no tratamento da função inicia por tipo cartão, onde era verificado de forma errada
+             o nome do tipo de cartão que deveria ser exibido caso o Muxx enviasse para ponta.
+
+             Correção do campo nome do produto que estava sendo enviada de forma errada para o Muxx,
+             fazendo com que algumas transações ocorresse alguns problemas.
+
+0004.0000.0060.0000 (24/Ago/2018)
+----------------------------------
+- CA18-0077: Passa a descatar as advices que foram negadas pelo PGWEB. As mesma serão evidenciadas
+             nos logs.
+
+             Correçao no tamanho do AID enviado nas Advices para o PGWEB.
+
+0004.0000.0061.0000 (31/Ago/2018)
+----------------------------------
+- CA18-0078: Tratamento para PIN-pad iPP320 com base nas inicializações CTLS.
+
+0004.0000.0062.0000 (03/Set/2018)
+----------------------------------
+- CA18-0078: Correções na camada de tratamentos de PIN-Pad para correto funcionamento do roteamento.
+
+0004.0000.0063.0000 (18/Set/2018)
+----------------------------------
+- CA18-0083: No comando PP_iRemoveCard, caso o PIN-pad não envie a mensagem de remoção do cartão
+             para exibição no checkout via PP_NOTIFY, passa a forçar a exibição da mensagem.
+
+- CA18-0083: Caso uma transação seja feita utilizando roteamento de bandeiras, envia uma flag 
+             para o Muxx notificando.
+
+0004.0000.0064.0000 (04/Out/2018)
+----------------------------------
+- CA18-0085: Caso exista uma atualização de parâmetros pós troca de versão pendente, a chamada
+             de PW_iGetResult com PWINFO_IDLEPROCTIME passa a retorna o horário atual.
+
+- CA18-0085: Caso seja chamado PW_iIdleProc e exista uma atualização de parâmetros pós troca de 
+             versão pendente, passa a executá-la imediatamente.
+
+- CA18-0086: Correções nos tratamentos específicos de PIN-pad, que fazia com que alguns pontos de 
+             captura não pudessem utilizar o roteamento de bandeiras.
+
+0004.0000.0065.0000 (23/Out/2018)
+----------------------------------
+- CA18-0088: Correção no envio de informações para o servidor, essas informações (chaves de dados) são
+             utilizadas para realizar o check value no Muxx.
+- CA18-0091: Na camada de tratamento de PIN-pad foi adicionado o tratamento para iPP350 Ingenico, o mesmo
+             tratamento utilizado no iPP320 (Troca de índice).
+- CA18-0094: Implementado o menu para exibir o ponto de captura, será possível consultar o identificador do 
+             PdC por meio de um menu.
+- CA18-0093: Correção no envio de advice para o Muxx, afim de evitar que o PdC fique travado.
+
+0004.0000.0066.0000 (31/Out/2018)
+----------------------------------
+-CA18-0096: Tratamento para que seja solicitado o tipo de cartão em cancelamento quando
+            a transação iniciar por tipo de cartão.            
+            Ajustado o retorno do getcard, que poderia gerar um código de resultado positivo
+            para a advice.
+-CA18-0099: Adiciona tratamento para retorno do PP_iGetInfo ao verificar as informações do
+            pinpad a serem enviadas ao PGWeb.
+            Isso evita que sejam adicionadas strings incorretas ao buffer de comunicação.
+-CA18-0096: Correção para que o PIN-Pad não fique sem resposta quando realizado uma carga de
+            tabelas com roteamento de bandeiras ativo.
+
+0004.0000.0067.0000 (23/Nov/2018)
+----------------------------------
+-CA18-0104: Correção do tratamento da Tag CARDEXP, zerando o conteúdo de relativo a ela 
+            em psOutput caso ela não esteja presente.
+-CA18-0105: Altera o funcionamento das funções iLoadTableRoteamento e iCheckRoutingTables para verificar
+            todos os estabelecimentos e não quebrar o laço no id 0.
+-CA18-0107: Caso POS, alterado o retorno na função (PW_iExecTransac) para alteração do fluxo de remoção do cartão.
+-CA18-0110: Passa a acatar alguns parametros GPRS para que, caso necessário, o POS consiga apagar alguns dados
+            tais como usuário e senha PPP.
+
+0004.0000.0068.0000 (26/Nov/2018)
+----------------------------------
+-CA18-0107: - Removido a funcionalidade de alterado o retorno na função (PW_iExecTransac) para alteração do fluxo de remoção do cartão.
+
+
+0004.0000.0069.0000 (06/Dez/2018)
+----------------------------------
+- CA18-0115: Correção no fluxo de cancelamento quando utilizado a opção de tipo de cartão habilitada.
+- CA18-0116: Correção no erro na checagem do CRC dos arquivos, que poderia originar a mensagem "ERRO NO ACESSO DE ARQUIVO".
+- CA18-0116: Melhoria no tratamento de arquivos na atualização de versão.
+- CA18-0116: Correção na diferença de tempo entre a exibição da mensagem de espera do cartão para o
+             operador para a mensagem exibida no leitor de cartão.
+
+0004.0000.0070.0000 (07/Dez/2018)
+----------------------------------
+- CA18-0117: Criação de uma função para obtenção de um PIN block do PIN-pad.
+
+
