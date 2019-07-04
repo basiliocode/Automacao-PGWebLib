@@ -189,6 +189,8 @@ public class Transacao {
 
     private String getDataToString() {
         String getdata = "";
+
+        //pegando os dados da estrutura do menu
         for (int i = 0; i < iNumParam.getValue(); i++){
             String menus = ""; int cont = 0;
             try {
@@ -196,6 +198,7 @@ public class Transacao {
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
+
             getdata += "wIdwntificador = " + getWidentificador(i) + "\n"
                     + "bTipoDeDaDo  = " + getBtipoDeDado(i) + "\n"
                     + "szPrompt  = " +  getSzPrompt(i) + "\n"
@@ -224,7 +227,7 @@ public class Transacao {
                     + "bTipoEntradaCodigoBarras = " + getBtipoEntradaCodigoBarras(i) + "\n"
                     + "bOmiteMsgAlerta = " + getBomiteMsgAlerta(i) + "\n"
                     + "bIniciaPelaEsquerda = " + getBiniciaPelaEsquerda(i) + "\n"
-                    + "bNotificarCancelamento = " + getBnotificarCancelamento(i) + "\n";
+                    + "bNotificarCancelamento = " + getBnotificarCancelamento(i) + "\n\n";
         }
         return getdata;
     }

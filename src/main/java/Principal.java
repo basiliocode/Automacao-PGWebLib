@@ -287,7 +287,7 @@ public class Principal {
 
                 pwRet = transac.execTransac();
                 System.out.println("Exec Transac " + pwRet);
-                System.out.println("AGUARDE...");
+                System.out.println("AGUARDE...\n");
                 mostrarDadosDaTransacao(transac);
                 j = 0;
             }
