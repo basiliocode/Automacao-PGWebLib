@@ -34,6 +34,7 @@ public class PW_GetData extends Structure{
     public byte bOmiteMsgAlerta;
     public byte bIniciaPelaEsquerda;
     public byte bNotificarCancelamento;
+    public byte [] bAlinhaPelaDireita = new byte[19];
 
     @Override
     protected List<String> getFieldOrder() {
@@ -66,7 +67,8 @@ public class PW_GetData extends Structure{
                 "bTipoEntradaCodigoBarras",
                 "bOmiteMsgAlerta",
                 "bIniciaPelaEsquerda",
-                "bNotificarCancelamento"
+                "bNotificarCancelamento",
+                "bAlinhaPelaDireita"
          );
     }
 
